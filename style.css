@@ -1,0 +1,172 @@
+/* =========================================================
+   受付マスコット 取扱説明書 — shared styles
+   Page-specific placement lives in pages.css.
+   ========================================================= */
+
+:root {
+  --green: #55b95b; --green-d: #2B7A35; --green-dd: #1F5A27;
+  --cream: #FFF9EC; --grid: #EFE6CF; --ink: #1F2B22;
+  --orange: #F2895A; --yellow: #F5BC3C; --navy: #1F4E6E; --muted: #8A7C60;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--green); color: var(--ink); font-family: 'M PLUS Rounded 1c', sans-serif; }
+body.loading { overflow: hidden; }
+/* PC: the page scrolls an invisible track to turn the pages, so the browser's scrollbar would show as a
+   white strip along the right edge of the notebook — hide it (scrolling still works) */
+html:not(:has(body.sp)) { scrollbar-width: none; }
+html:not(:has(body.sp))::-webkit-scrollbar { display: none; }
+
+/* ---------- stage: a fixed 1440×900 design, scaled to fit the window (main.js) ---------- */
+#track { width: 1px; }                       /* its height is the scroll length */
+#viewport { position: fixed; inset: 0; overflow: hidden; background: var(--green); }
+/* The stage is as wide/tall as the window (in design pixels, set by main.js), so the paper can follow the window's shape.
+   --bx/--by: the green border around the paper. --ox/--oy: where the 1440×900 content box sits, centred. */
+#stage {
+  --bx: 40px; --by: 28px;
+  position: absolute; left: 50%; top: 50%; width: 1440px; height: 900px; transform-origin: 0 0;
+}
+
+/* each page turns around the rings. Only the current page and the next one are drawn (main.js adds .show);
+   the 3D perspective sits on the turning page itself, so browsers never mix two pages together. */
+.pg {
+  position: absolute; inset: 0; transform-origin: var(--bx) 50%;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  visibility: hidden; will-change: transform;
+}
+.pg.show { visibility: visible; }
+.pgRoot { position: absolute; left: var(--ox, 0px); top: var(--oy, 0px); width: 1440px; height: 900px; font-family: 'M PLUS Rounded 1c', sans-serif; color: var(--ink); }
+
+/* the notebook paper: fills the window minus the green border, rounded corners like the design sheet */
+.page {
+  position: absolute; left: var(--bx); top: var(--by); right: var(--bx); bottom: var(--by); border-radius: 26px;
+  background-color: var(--cream);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  box-shadow: 0 10px 0 var(--green-dd);
+}
+/* one set of rings for the whole notebook, above the pages (below the opening's loader/sketch layers) */
+.rings { position: absolute; inset: 0; z-index: 35; pointer-events: none; }
+.ring { position: absolute; left: calc(var(--bx) - 16px); width: 34px; height: 120px; border: 7px solid var(--yellow); border-radius: 18px; box-shadow: 0 4px 0 #C98F1B; }
+.ringA { top: calc(var(--oy, 0px) + 130px); }
+.ringB { top: calc(var(--oy, 0px) + 650px); }
+
+/* wide windows: items slide outward (main.js sets --f per item: -1 = left edge … 1 = right edge) */
+.spread { translate: calc(var(--f, 0) * var(--ox, 0px)) 0; }
+.spreadWide { scale: calc(1 + var(--oxn, 0) / 720) 1; }
+/* the sheet's drawing is narrower than the other pages, so it spreads an extra 110px (design size) on each side */
+#sheet .spread { translate: calc(var(--f, 0) * (var(--ox, 0px) + 110px) / .83) 0; }
+#sheet .spreadWide { scale: calc(1 + (var(--oxn, 0) + 110) / .83 / 720) 1; }
+
+/* darkens the page underneath while the page above is turning */
+#shade { position: absolute; left: var(--bx); top: var(--by); right: var(--bx); bottom: var(--by); border-radius: 26px; z-index: 19; background: var(--ink); opacity: 0; pointer-events: none; will-change: opacity; }
+
+/* ---------- ③ character sheet: drawn at 1440×1100; its content (top 0 … about 1010) is shrunk to 83% to fit the paper ---------- */
+#sheet .tall { position: absolute; left: 0; top: 0; width: 1440px; height: 1100px; transform: translate(calc(var(--ox, 0px) + 122px), calc(var(--oy, 0px) + 30px)) scale(.83); transform-origin: 0 0; }
+#sheet .pgRoot { left: 0; top: 0; }
+#sheet .pgRoot { height: 1100px; }
+
+/* ---------- ② 名札: the paragraph being read is dark ---------- */
+#nafuda .story p { transition: color .9s, transform .9s; }
+#nafuda .story p.now { transform: translateX(6px); }
+#nafuda .story p.last { transition: color .9s, font-size .9s; }
+#nafuda .story.end p.last { font-size: 32px; letter-spacing: .12em; }
+#nafuda .story .kachi { transition: color .9s; }
+#nafuda .story.end .kachi { color: #E2463A; }
+#storyBar { transition: top .9s, height .9s; }
+
+
+/* ---------- loader ---------- */
+#loader { position: fixed; inset: 0; z-index: 50; background: var(--green); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; transition: opacity .7s; }
+#loader.gone { opacity: 0; pointer-events: none; }
+#loader .logo { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; background: var(--cream); animation: bobLogo 2s ease-in-out infinite; }
+#loader .logo img { width: 100%; height: 150%; object-fit: cover; object-position: 50% 6%; display: block; filter: brightness(0); }
+#loader .bar { width: 220px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .3); overflow: hidden; }
+#loadBar { height: 100%; width: 0; background: #fff; border-radius: 2px; transition: width .8s ease; }
+@keyframes bobLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* ---------- opening: a line-drawing copy of the cover, then the colour paints in ---------- */
+#openBg { position: absolute; inset: 0; z-index: 40; background: var(--green); }   /* keeps the real page hidden until the paint-in */
+#sketchCard { position: absolute; inset: 0; z-index: 41; pointer-events: none; clip-path: inset(41% 43% 41% 43% round 18px); opacity: 0; }
+#openBg.hidden, #sketchCard.hidden { display: none; }
+#sketch { position: absolute; inset: 0; background: var(--green); }
+/* turn every coloured thing in the copy into navy outlines (these must win over the page's own colours) */
+#sketch * {
+  color: #FFFDF6 !important; -webkit-text-stroke: 1.4px var(--navy); paint-order: stroke fill;
+  background: transparent !important; box-shadow: none !important; text-shadow: none !important;
+  border-color: var(--navy) !important; animation: none !important;
+}
+#sketch p, #sketch small { color: var(--navy) !important; -webkit-text-stroke: 0; }
+#sketch .page {
+  border: 3px solid var(--navy);
+  background: #FFFDF6 radial-gradient(circle, rgba(31, 78, 110, .25) 1.4px, transparent 1.6px) 14px 14px / 28px 28px !important;
+}
+#sketch .ring { border-width: 3px; }
+#sketch .sk-line { border-width: 2px; }
+#sketch .sk-fill { outline: 2px solid var(--navy); outline-offset: -2px; }
+#sketch img { filter: brightness(0) invert(1) drop-shadow(3px 0 0 #1F4E6E) drop-shadow(-3px 0 0 #1F4E6E) drop-shadow(0 3px 0 #1F4E6E) drop-shadow(0 -3px 0 #1F4E6E) !important; }
+#sketch svg path, #sketch svg circle, #sketch svg ellipse { stroke: var(--navy) !important; fill: none !important; stroke-width: 2.5 !important; }
+
+/* ---------- ⑤ あそぶ: 足りないピースは どれ？ ---------- */
+#play .playRoot { position: absolute; left: var(--ox, 0px); top: var(--oy, 0px); width: 1440px; height: 900px; }
+#play .crumb { position: absolute; left: 120px; top: 62px; font-size: 13px; font-weight: 800; letter-spacing: .14em; color: var(--muted); }
+#play .title { position: absolute; left: 130px; top: 96px; display: flex; flex-direction: column; gap: 8px; }
+#play .tag { align-self: flex-start; background: var(--orange); color: #fff; font-size: 15px; font-weight: 900; padding: 4px 14px; border-radius: 8px; }
+#play h2 { margin: 0; font-family: 'Mochiy Pop One', sans-serif; font-weight: 400; font-size: 44px; line-height: 1.2; }
+#play .chooser { position: absolute; left: 870px; top: 82px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+#play .hint { font-size: 14px; font-weight: 900; color: var(--muted); }
+#play .thumbs { display: flex; gap: 12px; }
+#play .thumbs label { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; font-weight: 900; }
+#play .thumb { width: 96px; height: 72px; padding: 0; border-radius: 10px; background-size: cover; background-position: center; cursor: pointer; border: 4px solid #fff; box-shadow: 0 4px 0 #E3DDCC; }
+#play .thumb[aria-pressed="true"] { border-color: var(--orange); box-shadow: 0 4px 0 #C8623A; }
+#play .opts { position: absolute; left: 150px; top: 232px; display: flex; flex-direction: column; gap: 22px; }
+#play .opt { display: flex; align-items: center; gap: 16px; }
+#play .badge { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 3px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 22px; flex: none; }
+#play .piece { width: 150px; height: 150px; padding: 0; border: 6px solid #fff; border-radius: 14px; background-size: 600px 450px; cursor: grab; box-shadow: 0 8px 16px rgba(80, 60, 20, .25); transition: transform .15s; touch-action: none; }
+#play .piece:hover { transform: translateY(-4px) rotate(-2deg); }
+#play .piece:focus-visible, #play .thumb:focus-visible, #play .next:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+#play .piece.used { opacity: .25; pointer-events: none; }
+#play .optHint { position: absolute; left: 150px; top: 760px; font-size: 13px; font-weight: 800; color: var(--muted); }
+#play .board { position: absolute; left: 500px; top: 228px; padding: 12px; background: #fff; border-radius: 22px; box-shadow: 0 12px 24px rgba(80, 60, 20, .2); }
+#play .pic { position: relative; width: 600px; height: 450px; border-radius: 12px; overflow: hidden; background-size: 600px 450px; }
+#play .hole { position: absolute; width: 150px; height: 150px; background: rgba(31, 43, 34, .78); box-shadow: inset 0 0 0 4px rgba(255, 255, 255, .7), inset 0 10px 20px rgba(0, 0, 0, .4); transition: opacity .35s; }
+#play .hole.hot { background: rgba(242, 137, 90, .6); }
+#play .hole.filled { opacity: 0; }
+#play .cuts { position: absolute; left: 0; top: 0; }
+#play .confetti { position: absolute; inset: 0; pointer-events: none; }
+#play .confetti i { position: absolute; top: -20px; width: 12px; height: 16px; border-radius: 3px; animation: fall 2.4s linear infinite; }
+#play .progress { position: absolute; left: 500px; top: 730px; width: 624px; display: flex; align-items: center; justify-content: space-between; }
+#play .stamps { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 900; }
+#play #stamps { display: flex; gap: 10px; }
+#play .stamp { width: 34px; height: 34px; border-radius: 50%; border: 3px solid #D9CFB6; background: #fff; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
+#play .stamp.on { background: var(--orange); border-color: #C8623A; }
+#play .next { border: 0; cursor: pointer; background: var(--green); color: #fff; font-family: inherit; font-size: 18px; font-weight: 900; padding: 12px 26px; border-radius: 999px; box-shadow: 0 5px 0 var(--green-d); }
+#play .stk { position: absolute; object-fit: contain; filter: drop-shadow(5px 0 0 #fff) drop-shadow(-5px 0 0 #fff) drop-shadow(0 5px 0 #fff) drop-shadow(0 -5px 0 #fff) drop-shadow(0 10px 12px rgba(80, 60, 20, .22)); }
+#play .watcher { left: 1150px; top: 470px; width: 190px; height: 285px; }
+#play .bob { animation: bob 2.6s ease-in-out infinite; }
+#play .say { position: absolute; left: 1150px; top: 400px; background: #fff; border: 3px solid var(--ink); border-radius: 20px; padding: 10px 18px; font-size: 18px; font-weight: 900; box-shadow: 0 5px 0 var(--ink); white-space: nowrap; }
+#play .say.pop { animation: popSay .45s cubic-bezier(.3, 1.5, .5, 1) both; }
+#play .shake { animation: shake .45s ease-in-out; }
+.dragGhost { position: fixed; z-index: 40; pointer-events: none; border: 6px solid #fff; border-radius: 14px; box-shadow: 0 16px 30px rgba(0, 0, 0, .3); transform: rotate(-4deg); }
+
+@keyframes fall { 0% { transform: translateY(-40px) rotate(0); } 100% { transform: translateY(520px) rotate(540deg); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-10px) rotate(-3deg); } 40% { transform: translateX(10px) rotate(3deg); } 60% { transform: translateX(-6px); } 80% { transform: translateX(6px); } }
+@keyframes pop { 0% { transform: translate(-50%, -50%) scale(.4); opacity: 0; } 70% { transform: translate(-50%, -50%) scale(1.1); } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+@keyframes popSay { 0% { transform: scale(.5); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+/* ③ キャラクターシート: the stickers stick on one by one (main.js adds .stuck; --d = each one's turn).
+   scale/rotate are their own properties, so they don't fight the stickers' own transforms and bobbing. */
+.stickers .stick { opacity: 0; scale: .35; rotate: -14deg; }
+.measuring .stickers .stick { scale: 1; rotate: 0deg; transition: none; }
+.stickers.stuck .stick { opacity: 1; scale: 1; rotate: 0deg;
+  transition: opacity .35s ease-out var(--d), scale .9s cubic-bezier(.3, 1.6, .5, 1) var(--d), rotate .9s cubic-bezier(.3, 1.6, .5, 1) var(--d); }
+
+/* ⑥ さいご: the whole date memo pops up onto the page (main.js adds .on), like the sheet's stickers */
+.memoAnim :is(.en1, .m6-memo) { opacity: 0; scale: .35; }
+.measuring .memoAnim .m6-memo { scale: 1; transition: none; }
+.memoAnim.on :is(.en1, .m6-memo) { opacity: 1; scale: 1;
+  transition: opacity .35s ease-out .15s, scale .9s cubic-bezier(.3, 1.6, .5, 1) .15s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

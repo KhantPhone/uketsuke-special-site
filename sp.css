@@ -1,0 +1,229 @@
+/* =========================================================
+   Phone version (portrait screens): built from the SP boards (390×844).
+   A normal scroll: the six pages sit one under another on one long sheet of grid paper,
+   bound by rings at the very top. (main.js scales the stack to the screen's width.)
+   ========================================================= */
+
+#spStage {
+  position: relative; left: 0; top: 0; width: 390px; transform-origin: 0 0; display: none;
+  background-color: var(--cream);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+body.sp #spStage { display: block; }
+body.sp #stage, body.sp #track { display: none; }
+/* the page scrolls itself instead of the fixed PC viewport */
+body.sp #viewport { position: relative; inset: auto; overflow: hidden; background: var(--cream); }
+/* phone browsers tint their status bar / toolbar from the page background, so that is cream too */
+html:has(body.sp), body.sp { background: var(--cream); }
+
+/* each page is one section of the sheet, always visible, never turned
+   (main.js trims each section to its content and sets its height, so every page is the same distance apart) */
+#spStage .pg { position: relative; inset: auto; height: 844px; visibility: visible; will-change: auto; }
+/* between pages: a dashed line with the page number, centred in the gap */
+#spStage .spDivider { position: absolute; left: 34px; right: 34px; top: 0; transform: translateY(-50%); display: flex; align-items: center; gap: 12px; z-index: 1; }
+#spStage .spDivider i { flex: 1; border-top: 2px dashed #D9CFB6; }
+#spStage .spDivider span { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .08em; color: var(--muted); }
+#spStage .page, #spShade { display: none; }   /* the sheet itself is the paper */
+/* opening: the line-drawing copy of the cover gets its dotted paper, and the real cover its grid paper while it paints in */
+#spStage #sketch .page { display: block; inset: 0; border: 0; border-radius: 0; }
+#spStage .pg.painting {
+  background-color: var(--cream);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.spRoot { position: absolute; left: 0; top: 0; width: 390px; height: 844px; font-family: 'M PLUS Rounded 1c', sans-serif; color: var(--ink); }
+
+#spStage .ring { top: -12px; width: 18px; height: 36px; border: 5px solid var(--yellow); border-radius: 12px; box-shadow: 0 3px 0 #C98F1B; }
+#spStage .spRingA { left: 110px; }
+#spStage .spRingB { left: 186px; }
+#spStage .spRingC { left: 262px; }
+
+#spStage .stk { position: absolute; object-fit: contain; filter: drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 6px 8px rgba(80, 60, 20, .22)); }
+
+@keyframes spBreathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.015); } }
+@keyframes spCue { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 75% { transform: translateY(40px); opacity: 1; } 100% { transform: translateY(40px); opacity: 0; } }
+@keyframes spSwing { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(2deg); } }
+@keyframes spSway { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(4deg); } }
+@keyframes spBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes spWave { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
+#spStage .breathe { animation: spBreathe 3s ease-in-out infinite; transform-origin: 50% 100%; }
+#spStage .sway { animation: spSway 3.6s ease-in-out infinite; transform-origin: 50% 0; }
+#spStage .bob { animation: spBob 3s ease-in-out infinite; }
+#spStage .wave { animation: spWave 2.8s ease-in-out infinite; transform-origin: 50% 100%; }
+
+/* ---------- ① 表紙 ---------- */
+#spStage .m1-title { position: absolute; left: 34px; top: 72px; width: 322px; display: flex; flex-direction: column; gap: 10px; }
+#spStage .m1-pill { align-self: flex-start; background: #fff; border: 2px solid var(--ink); border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 900; }
+#spStage .m1-title h1 { margin: 0; font-family: 'Mochiy Pop One', sans-serif; font-weight: 400; font-size: 48px; line-height: 1.2; min-height: 116px; }
+#spStage .m1-g { color: var(--green); }
+#spStage .m1-o { color: var(--orange); }
+#spStage .m1-y { color: var(--yellow); }
+#spStage .m1-pol { position: absolute; left: 262px; top: 140px; width: 96px; background: #fff; padding: 6px 6px 20px; box-shadow: 0 8px 14px rgba(80, 60, 20, .2); transform: rotate(7deg); }
+#spStage .m1-polPic { height: 64px; background: #3B4A3E; display: flex; align-items: center; justify-content: center; font-family: 'Mochiy Pop One', sans-serif; font-size: 34px; color: var(--cream); }
+#spStage .m1-polCap { position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; font-size: 9px; font-weight: 800; color: #6E6250; }
+#spStage .m1-blob { position: absolute; left: 70px; top: 300px; }
+#spStage .m1-sil { position: absolute; left: 100px; top: 250px; width: 190px; height: 285px; object-fit: contain; filter: brightness(0) drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 4px 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(0 10px 12px rgba(80, 60, 20, .25)); }
+#spStage .m1-q { position: absolute; font-family: 'Mochiy Pop One', sans-serif; -webkit-text-stroke: 4px var(--cream); paint-order: stroke fill; }
+#spStage .m1-q1 { left: 70px; top: 262px; font-size: 40px; color: var(--orange); transform: rotate(-14deg); }
+#spStage .m1-q2 { left: 292px; top: 300px; font-size: 48px; color: var(--green); transform: rotate(14deg); }
+#spStage .m1-lbl { position: absolute; display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 900; white-space: nowrap; }
+#spStage .m1-lbl b { font-weight: 900; background: #FFE9C9; padding: 2px 8px; border-radius: 5px; }
+#spStage .m1-lbl small { display: block; font-size: 10px; font-weight: 700; color: #6E6250; margin-top: 1px; }
+#spStage .m1-right { text-align: right; }
+#spStage .m1-spark { color: var(--orange); font-size: 15px; line-height: 1; }
+#spStage .m1-r1 { left: 216px; top: 412px; }
+#spStage .m1-r2 { left: 32px; top: 500px; }
+#spStage .m1-r3 { left: 216px; top: 548px; }
+#spStage .m1-name { position: absolute; left: 34px; top: 610px; width: 322px; display: flex; flex-direction: column; gap: 8px; }
+#spStage .m1-nameRow { display: flex; align-items: center; gap: 8px; }
+#spStage .m1-tag { background: var(--orange); color: #fff; font-size: 12px; font-weight: 900; padding: 3px 10px; border-radius: 6px; }
+#spStage .m1-qqq { font-family: 'Mochiy Pop One', sans-serif; font-size: 22px; letter-spacing: .1em; color: var(--muted); }
+#spStage .m1-name p { margin: 0; font-size: 13px; font-weight: 700; line-height: 1.7; color: #4A4033; font-family: sans-serif; }
+#spStage .m1-cueLine { position: absolute; left: 194px; top: 760px; width: 2px; height: 44px; background: #D9CFB6; }
+#spStage .m1-cue { position: absolute; left: 190px; top: 754px; width: 10px; height: 10px; border-radius: 50%; background: var(--orange); animation: spCue 2s cubic-bezier(.6, 0, .4, 1) infinite; }
+
+/* ---------- ② 名札: the PC card at 44%, hanging from the top of the page ---------- */
+#spStage .m2-hold { position: absolute; left: -165px; top: 34px; width: 720px; height: 800px; transform: scale(.44); transform-origin: 50% 0; }
+#spStage .m2-swing { position: absolute; inset: 0; animation: spSwing 3.2s ease-in-out infinite; transform-origin: 50% 0; }
+#spStage .m2-strap { position: absolute; left: 320px; top: 0; width: 80px; height: 250px; background: var(--orange); box-shadow: inset -10px 0 0 #E07446; }
+#spStage .m2-clip { position: absolute; left: 310px; top: 236px; width: 100px; height: 64px; background: #E3E1DA; border: 4px solid #B9B5AA; border-radius: 10px; }
+#spStage .m2-card { position: absolute; left: 40px; top: 290px; width: 640px; height: 420px; background: var(--yellow); border-radius: 34px; box-shadow: 0 10px 0 #C98F1B, 0 30px 40px rgba(80, 60, 20, .25); }
+#spStage .m2-inner { position: absolute; left: 30px; top: 46px; width: 580px; height: 344px; background: #fff; border-radius: 16px; display: flex; gap: 26px; padding: 26px; }
+#spStage .m2-photo { flex: none; width: 200px; height: 236px; background: var(--green); border-radius: 8px; overflow: hidden; position: relative; }
+#spStage .m2-photo img { position: absolute; left: -40px; top: 6px; width: 280px; height: 420px; object-fit: cover; object-position: 50% 0; }
+#spStage .m2-fields { flex: 1; display: flex; flex-direction: column; gap: 14px; padding-top: 6px; min-width: 0; }
+#spStage .m2-field { display: flex; align-items: baseline; gap: 14px; border-bottom: 3px solid #E6E1D3; padding-bottom: 8px; }
+#spStage .m2-field span:first-child { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 20px; color: #A49C88; flex: none; width: 76px; }
+#spStage .m2-big { font-family: 'Mochiy Pop One', sans-serif; font-size: 25px; white-space: nowrap; }
+#spStage .m2-id { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 22px; }
+#spStage .m2-sign { font-family: 'Yomogi', cursive; font-size: 40px; transform: rotate(-6deg); margin-top: 4px; white-space: nowrap; }
+#spStage .m2-mvp { position: absolute; left: -10px; top: 230px; width: 220px; height: 130px; border-radius: 50%; background: #E2463A; border: 6px solid #fff; display: flex; align-items: center; justify-content: center; transform: rotate(-14deg); }
+#spStage .m2-mvp span { font-family: 'Mochiy Pop One', sans-serif; font-size: 58px; color: #fff; }
+#spStage .m2-line { position: absolute; left: 34px; top: 390px; width: 2px; height: 400px; background: #E6DCC4; }
+#spStage .m2-bar { position: absolute; left: 34px; top: 432px; width: 2px; height: 96px; background: var(--orange); transition: top .9s, height .9s; }
+#spStage .m2-story { position: absolute; left: 52px; top: 394px; width: 306px; }
+#spStage .m2-story p { margin: 0 0 18px; font-size: 14px; font-weight: 800; line-height: 1.9; letter-spacing: .06em; color: #D9CFB6; transition: color .9s; }
+#spStage .m2-story p.now { color: var(--ink); font-weight: 700; }
+#spStage .m2-story .kachi { transition: color .9s; }
+#spStage .m2-story.end .kachi { color: #E2463A; }
+
+/* ---------- ③ キャラクターシート ---------- */
+#spStage .m3-tagHang { position: absolute; left: 294px; top: 34px; width: 64px; display: flex; flex-direction: column; align-items: center; }
+#spStage .m3-string { width: 2px; height: 30px; background: var(--muted); }
+#spStage .m3-tag { width: 58px; height: 78px; background: var(--yellow); border: 3px solid #C98F1B; border-radius: 12px 12px 10px 10px; display: flex; flex-direction: column; align-items: center; padding-top: 7px; gap: 3px; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 9px; color: #5E4310; }
+#spStage .m3-hole { width: 9px; height: 9px; border-radius: 50%; background: var(--cream); border: 2px solid #C98F1B; }
+#spStage .m3-tag img { width: 30px; height: 36px; object-fit: contain; filter: brightness(0) opacity(.75); }
+#spStage .m3-title { position: absolute; left: 34px; top: 70px; display: flex; flex-direction: column; gap: 6px; }
+#spStage .m3-chip { align-self: flex-start; background: var(--orange); color: #fff; font-size: 11px; font-weight: 900; padding: 3px 10px; border-radius: 6px; }
+#spStage .m3-title h2 { margin: 0; font-family: 'Mochiy Pop One', sans-serif; font-weight: 400; font-size: 28px; line-height: 1.2; }
+#spStage .m3-o { color: var(--orange); }
+#spStage .m3-blob { position: absolute; left: 90px; top: 210px; }
+#spStage .m3-main { left: 112px; top: 160px; width: 166px; height: 249px; filter: drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 4px 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(0 8px 10px rgba(80, 60, 20, .22)); }
+#spStage .m3-lbl { position: absolute; display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 900; white-space: nowrap; }
+#spStage .m3-lbl b { font-weight: 900; background: #FFE9C9; padding: 2px 7px; border-radius: 5px; }
+#spStage .m3-lbl small { display: block; font-size: 9px; font-weight: 700; color: #6E6250; margin-top: 1px; }
+#spStage .m3-spark { color: var(--orange); font-size: 13px; line-height: 1; }
+#spStage .m3-l1 { left: 262px; top: 206px; }
+#spStage .m3-l2 { left: 26px; top: 300px; }
+#spStage .m3-l3 { left: 272px; top: 348px; }
+#spStage .m3-trait { position: absolute; width: 104px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+#spStage .m3-trait .stk { position: static; width: 74px; height: 104px; filter: drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 4px 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(0 8px 10px rgba(80, 60, 20, .22)); }
+#spStage .m3-trait b { font-size: 11px; font-weight: 900; background: #FFE9C9; padding: 2px 6px; border-radius: 5px; white-space: nowrap; }
+#spStage .m3-trait small { font-size: 9px; font-weight: 700; color: #6E6250; }
+#spStage .m3-t1 { left: 49px; top: 435px; }
+#spStage .m3-t2 { left: 234px; top: 519px; }
+#spStage .m3-t3 { left: 128px; top: 662px; }
+
+/* ---------- ④ 受付の流れ: the block holds still on screen while the steps slide sideways (main.js) ---------- */
+#spStage .m4-title { position: absolute; left: 34px; top: 70px; margin: 0; font-family: 'Mochiy Pop One', sans-serif; font-weight: 400; font-size: 30px; line-height: 1.2; }
+#spStage .m4-g { color: var(--green); }
+#spStage .m4-o { color: var(--orange); }
+#spFlow .slider { position: absolute; left: 0; top: 160px; width: 390px; height: 575px; will-change: transform; }
+#spFlow .slCount { position: absolute; right: 34px; top: 0; display: flex; align-items: baseline; gap: 4px; font-family: 'Fredoka', sans-serif; font-weight: 700; color: var(--muted); }
+#spFlow .slCount span:first-child { font-size: 12px; letter-spacing: .1em; }
+#spFlow .slCount span:last-child { font-size: 17px; }
+#spFlow .slNo { font-size: 36px; line-height: 1; color: var(--green); }
+#spFlow .slNo.last { color: var(--orange); }
+#spFlow .slWin { position: absolute; left: 0; top: 40px; width: 390px; height: 400px; overflow: hidden; }
+#spFlow .slTrack { position: absolute; left: 45px; top: 10px; display: flex; gap: 20px; will-change: transform; }
+#spFlow .slCard { flex: none; width: 300px; height: 375px; box-sizing: border-box; padding: 18px 18px 20px; background: #fff; border-radius: 20px; box-shadow: 0 10px 22px rgba(80, 60, 20, .14); display: flex; flex-direction: column; gap: 12px; }
+#spFlow .slHead { display: flex; align-items: center; gap: 10px; }
+#spFlow .slNum { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--green); color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 var(--green-d); }
+#spFlow .slNumO { background: var(--orange); box-shadow: 0 3px 0 #C8623A; }
+#spFlow .slHead b { font-size: 17px; font-weight: 900; background: #FFE9C9; padding: 3px 10px; border-radius: 6px; white-space: nowrap; }
+#spFlow .slPol { background: #fff; padding: 7px 7px 9px; box-shadow: 0 6px 14px rgba(80, 60, 20, .18); }
+#spFlow .slPol img { display: block; width: 250px; height: 170px; object-fit: cover; }
+#spFlow .slBub { background: #fff; border: 2px solid var(--ink); border-radius: 14px; padding: 8px 10px; font-size: 13px; font-weight: 800; line-height: 1.55; }
+#spFlow .slDino { position: absolute; top: 440px; left: 28px; width: 64px; height: 92px; object-fit: contain; filter: drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 6px 8px rgba(80,60,20,.22)); animation: spBob 1.6s ease-in-out infinite; }
+@keyframes spBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+#spFlow .slPath { position: absolute; left: 60px; top: 534px; width: 270px; border-top: 4px dotted #D9CFB6; }
+#spFlow .slWalked { position: absolute; left: 0; top: -4px; width: 0; height: 4px; border-radius: 2px; background: var(--green); }
+#spFlow .slPath span { position: absolute; top: -14px; width: 24px; height: 24px; margin-left: -12px; box-sizing: border-box; border-radius: 50%; border: 3px solid var(--green); background: var(--cream); color: var(--green); font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: background .3s, color .3s; }
+#spFlow .slPath span:nth-of-type(2) { left: 33.333%; }
+#spFlow .slPath span:nth-of-type(3) { left: 66.667%; }
+#spFlow .slPath span:nth-of-type(4) { left: 100%; }
+#spFlow .slPath span.on { background: var(--green); color: #fff; }
+#spFlow .slCue { position: absolute; left: 0; right: 0; top: 557px; text-align: center; font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--muted); transition: opacity .4s; }
+#spFlow .slCue.gone { opacity: 0; }
+
+/* ---------- ⑤ あそぶ ---------- */
+#spStage .m5-title { position: absolute; left: 34px; top: 68px; display: flex; flex-direction: column; gap: 6px; }
+#spStage .m5-chip { align-self: flex-start; background: var(--orange); color: #fff; font-size: 11px; font-weight: 900; padding: 3px 10px; border-radius: 6px; }
+#spStage .m5-title h2 { margin: 0; font-family: 'Mochiy Pop One', sans-serif; font-weight: 400; font-size: 26px; line-height: 1.2; }
+#spStage .m5-g { color: var(--green); }
+#spStage .m5-y { color: var(--yellow); }
+#spStage .m5-chooser { position: absolute; left: 34px; top: 149px; display: flex; align-items: center; gap: 10px; }
+#spStage .m5-hint { font-size: 11px; font-weight: 900; color: var(--muted); width: 58px; line-height: 1.4; }
+#spStage .m5-thumbs { display: flex; gap: 10px; }
+#spStage .m5-thumbs .thumb { width: 62px; height: 46px; padding: 0; border-radius: 8px; background-size: cover; background-position: center; border: 3px solid #fff; box-shadow: 0 3px 0 #E3DDCC; cursor: pointer; }
+#spStage .m5-thumbs .thumb[aria-pressed="true"] { border-color: var(--orange); box-shadow: 0 3px 0 #C8623A; }
+#spStage .m5-board { position: absolute; left: 24px; top: 224px; padding: 8px; background: #fff; border-radius: 16px; box-shadow: 0 8px 16px rgba(80, 60, 20, .2); }
+#spStage .m5-pic { position: relative; width: 326px; height: 245px; border-radius: 9px; overflow: hidden; background-size: 326px 245px; }
+#spStage .m5-hole { position: absolute; width: 81.5px; height: 81.5px; background: rgba(31, 43, 34, .78); box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .7); transition: opacity .35s; }
+#spStage .m5-hole.hot { background: rgba(242, 137, 90, .6); }
+#spStage .m5-hole.filled { opacity: 0; }
+#spStage .m5-cuts { position: absolute; left: 0; top: 0; }
+#spStage .m5-confetti { position: absolute; inset: 0; pointer-events: none; }
+#spStage .m5-confetti i { position: absolute; top: -20px; width: 8px; height: 11px; border-radius: 2px; animation: fall 2.4s linear infinite; }
+#spStage .m5-opts { position: absolute; left: 24px; top: 510px; width: 342px; display: flex; justify-content: space-around; }
+#spStage .m5-opts .opt { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+#spStage .m5-opts .badge { width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 14px; }
+#spStage .m5-opts .piece { width: 92px; height: 92px; padding: 0; border: 4px solid #fff; border-radius: 10px; background-size: 368px 276px; box-shadow: 0 6px 12px rgba(80, 60, 20, .25); cursor: grab; touch-action: none; }
+#spStage .m5-opts .piece.used { opacity: .25; pointer-events: none; }
+#spStage .m5-opts .piece.shake { animation: shake .45s ease-in-out; }
+#spStage .m5-optHint { position: absolute; left: 0; right: 0; top: 640px; margin: 0; text-align: center; font-size: 11px; font-weight: 800; color: var(--muted); }
+#spStage .m5-progress { position: absolute; left: 34px; top: 684px; display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 900; }
+#spStage .m5-stamps { display: flex; gap: 8px; }
+#spStage .m5-stamps .stamp { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #D9CFB6; background: #fff; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; }
+#spStage .m5-stamps .stamp.on { background: var(--orange); border-color: #C8623A; }
+#spStage .m5-next { position: absolute; left: 34px; top: 724px; border: 0; cursor: pointer; background: var(--green); color: #fff; font-family: inherit; font-size: 12px; font-weight: 900; padding: 8px 14px; border-radius: 999px; box-shadow: 0 4px 0 var(--green-d); }
+#spStage .m5-next[hidden] { display: none; }
+#spStage .m5-say { position: absolute; left: 188px; top: 736px; background: #fff; border: 2px solid var(--ink); border-radius: 14px; padding: 6px 12px; font-size: 13px; font-weight: 900; box-shadow: 0 3px 0 var(--ink); white-space: nowrap; }
+#spStage .m5-say.pop { animation: popSay .45s cubic-bezier(.3, 1.5, .5, 1) both; }
+#spStage .m5-watcher { left: 284px; top: 704px; width: 82px; height: 123px; }
+
+/* ---------- ⑥ さいご ---------- */
+#spStage .m6-title { position: absolute; left: 34px; top: 72px; margin: 0; font-family: 'Mochiy Pop One', sans-serif; font-weight: 400; font-size: 33px; line-height: 1.3; }
+#spStage .m6-g { color: var(--green); }
+#spStage .m6-o { color: var(--orange); }
+#spStage .m6-y { color: var(--yellow); }
+#spStage .m6-sun { position: absolute; left: 150px; top: 239px; width: 220px; height: 220px; border-radius: 50%; background: #FFE9B8; }
+#spStage .m6-dino { position: absolute; left: 176px; top: 203px; width: 186px; height: 279px; object-fit: contain; }
+#spStage .m6-tablet { position: absolute; left: 40px; top: 357px; width: 140px; height: 100px; background: var(--ink); border-radius: 12px; padding: 6px; box-shadow: 0 10px 16px rgba(40, 30, 10, .3); transform: rotate(-4deg); }
+#spStage .m6-tablet img { width: 100%; height: 100%; object-fit: cover; border-radius: 7px; display: block; }
+#spStage .m6-bub { position: absolute; left: 233px; top: 174px; background: #fff; border: 2px solid var(--ink); border-radius: 14px; padding: 6px 12px; font-size: 12px; font-weight: 900; box-shadow: 0 3px 0 var(--ink); transform: rotate(4deg); }
+#spStage .m6-memo { position: absolute; left: 26px; top: 500px; width: 338px; background: #fff; padding: 24px 22px 14px; box-shadow: 0 8px 16px rgba(80, 60, 20, .16); transform: rotate(-1.5deg); }
+#spStage .m6-tape { position: absolute; left: 50%; top: -12px; width: 90px; height: 24px; margin-left: -45px; background: rgba(245, 188, 60, .75); transform: rotate(-3deg); }
+#spStage .m6-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+#spStage .m6-event { font-size: 15px; font-weight: 900; color: var(--green); }
+#spStage .m6-year { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 17px; color: var(--muted); }
+#spStage .m6-day { display: flex; align-items: baseline; gap: 10px; padding: 9px 0; border-bottom: 2px dashed #E3DDCC; }
+#spStage .m6-day b { font-family: 'Mochiy Pop One', sans-serif; font-weight: 400; font-size: 21px; width: 120px; flex: none; }
+#spStage .m6-day b small { font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: 900; font-size: 13px; color: var(--orange); margin-left: 3px; }
+#spStage .m6-day span { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 20px; }
+#spStage .m6-last { border-bottom: 0; }
+#spStage .m6-expo { position: absolute; left: 34px; top: 738px; font-size: 18px; padding: 13px 28px; border-width: 3px; }
+#spStage .m6-sig { position: absolute; left: 0; right: 0; top: 822px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+#spStage .m6-sig span { font-family: 'Yomogi', cursive; font-size: 20px; color: #4A4033; }
+#spStage .m6-paw { transform: rotate(-14deg); }
